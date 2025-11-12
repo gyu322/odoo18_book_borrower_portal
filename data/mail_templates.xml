@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    
+    <!-- Extension Request Submitted Email -->
+    <record id="extension_request_submitted_email" model="mail.template">
+        <field name="name">Extension Request Submitted</field>
+        <field name="model_id" ref="model_library_extension_request"/>
+        <field name="subject">Extension Request Submitted - {{ object.book_id.title }}</field>
+        <field name="email_from">{{ (object.env.company.email or user.email) }}</field>
+        <field name="email_to">{{ object.member_id.email }}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: rgb(255, 255, 255);">
+                <div style="padding: 20px; background-color: #f8f9fa;">
+                    <h2 style="color: #007bff;">Extension Request Submitted</h2>
+                </div>
+                
+                <div style="padding: 20px;">
+                    <p>Dear {{ object.member_id.name }},</p>
+                    
+                    <p>Your extension request has been submitted successfully and is now pending review by our librarians.</p>
+                    
+                    <h3 style="color: #28a745;">Request Details:</h3>
+                    <ul>
+                        <li><strong>Request Reference:</strong> {{ object.name }}</li>
+                        <li><strong>Book:</strong> {{ object.book_id.title }} by {{ object.book_id.author }}</li>
+                        <li><strong>Current Due Date:</strong> {{ object.original_expiry_date }}</li>
+                        <li><strong>Requested New Due Date:</strong> {{ object.requested_expiry_date }}</li>
+                        <li><strong>Extension Days:</strong> {{ object.extension_days }}</li>
+                        <li><strong>Submission Date:</strong> {{ object.request_date }}</li>
+                    </ul>
+                    
+                    % if object.request_reason:
+                    <h3 style="color: #6c757d;">Your Reason:</h3>
+                    <p style="font-style: italic;">{{ object.request_reason }}</p>
+                    % endif
+                    
+                    <div style="margin: 20px 0; padding: 15px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 5px;">
+                        <strong>What happens next?</strong><br/>
+                        Our librarians will review your request and notify you of the decision via email.
+                        You can also check the status in your portal account.
+                    </div>
+                    
+                    <p>
+                        <a href="/my/extension-requests/{{ object.id }}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">
+                            View Request Details
+                        </a>
+                    </p>
+                    
+                    <p>Thank you for using our library portal.</p>
+                    
+                    <p>Best regards,<br/>
+                    Library Team</p>
+                </div>
+                
+                <div style="padding: 10px 20px; background-color: #f8f9fa; color: #6c757d; font-size: 10px;">
+                    This is an automated email. Please do not reply to this email address.
+                </div>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Extension Request Approved Email -->
+    <record id="extension_request_approved_email" model="mail.template">
+        <field name="name">Extension Request Approved</field>
+        <field name="model_id" ref="model_library_extension_request"/>
+        <field name="subject">Extension Request Approved - {{ object.book_id.title }}</field>
+        <field name="email_from">{{ (object.env.company.email or user.email) }}</field>
+        <field name="email_to">{{ object.member_id.email }}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: rgb(255, 255, 255);">
+                <div style="padding: 20px; background-color: #d4edda;">
+                    <h2 style="color: #155724;">✅ Extension Request Approved</h2>
+                </div>
+                
+                <div style="padding: 20px;">
+                    <p>Dear {{ object.member_id.name }},</p>
+                    
+                    <p>Great news! Your extension request has been <strong>approved</strong> by our librarians.</p>
+                    
+                    <h3 style="color: #28a745;">Updated Borrowing Details:</h3>
+                    <ul>
+                        <li><strong>Book:</strong> {{ object.book_id.title }} by {{ object.book_id.author }}</li>
+                        <li><strong>Previous Due Date:</strong> {{ object.original_expiry_date }}</li>
+                        <li><strong>New Due Date:</strong> <span style="color: #28a745; font-weight: bold;">{{ object.new_expiry_date }}</span></li>
+                        <li><strong>Extension Days Granted:</strong> {{ object.extension_days }}</li>
+                        <li><strong>Approved By:</strong> {{ object.reviewed_by.name }}</li>
+                        <li><strong>Approval Date:</strong> {{ object.review_date }}</li>
+                    </ul>
+                    
+                    <div style="margin: 20px 0; padding: 15px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px;">
+                        <strong>Important Reminder:</strong><br/>
+                        Please ensure you return the book by the new due date: <strong>{{ object.new_expiry_date }}</strong><br/>
+                        Late returns may result in fines and affect future extension requests.
+                    </div>
+                    
+                    <p>
+                        <a href="/my/borrowed-books/{{ object.borrowing_record_id.id }}" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">
+                            View Borrowing Details
+                        </a>
+                    </p>
+                    
+                    <p>Thank you for using our library portal responsibly.</p>
+                    
+                    <p>Best regards,<br/>
+                    Library Team</p>
+                </div>
+                
+                <div style="padding: 10px 20px; background-color: #f8f9fa; color: #6c757d; font-size: 10px;">
+                    This is an automated email. Please do not reply to this email address.
+                </div>
+            </div>
+        </field>
+    </record>
+    
+    <!-- Extension Request Rejected Email -->
+    <record id="extension_request_rejected_email" model="mail.template">
+        <field name="name">Extension Request Rejected</field>
+        <field name="model_id" ref="model_library_extension_request"/>
+        <field name="subject">Extension Request Not Approved - {{ object.book_id.title }}</field>
+        <field name="email_from">{{ (object.env.company.email or user.email) }}</field>
+        <field name="email_to">{{ object.member_id.email }}</field>
+        <field name="body_html" type="html">
+            <div style="margin: 0px; padding: 0px; font-family: 'Lucida Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: rgb(255, 255, 255);">
+                <div style="padding: 20px; background-color: #f8d7da;">
+                    <h2 style="color: #721c24;">❌ Extension Request Not Approved</h2>
+                </div>
+                
+                <div style="padding: 20px;">
+                    <p>Dear {{ object.member_id.name }},</p>
+                    
+                    <p>We regret to inform you that your extension request has not been approved by our librarians.</p>
+                    
+                    <h3 style="color: #dc3545;">Request Details:</h3>
+                    <ul>
+                        <li><strong>Request Reference:</strong> {{ object.name }}</li>
+                        <li><strong>Book:</strong> {{ object.book_id.title }} by {{ object.book_id.author }}</li>
+                        <li><strong>Current Due Date:</strong> <span style="color: #dc3545; font-weight: bold;">{{ object.original_expiry_date }}</span></li>
+                        <li><strong>Requested Extension:</strong> {{ object.extension_days }} days</li>
+                        <li><strong>Reviewed By:</strong> {{ object.reviewed_by.name }}</li>
+                        <li><strong>Review Date:</strong> {{ object.review_date }}</li>
+                    </ul>
+                    
+                    % if object.rejection_reason:
+                    <h3 style="color: #dc3545;">Reason for Rejection:</h3>
+                    <p style="background-color: #f8d7da; padding: 10px; border-radius: 5px;">{{ object.rejection_reason }}</p>
+                    % endif
+                    
+                    <div style="margin: 20px 0; padding: 15px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+                        <strong>Important:</strong><br/>
+                        Please return the book by the original due date: <strong>{{ object.original_expiry_date }}</strong><br/>
+                        Returning books late may result in fines.
+                    </div>
+                    
+                    <p>If you have any questions about this decision, please contact our library staff.</p>
+                    
+                    <p>
+                        <a href="/my/borrowed-books/{{ object.borrowing_record_id.id }}" style="display: inline-block; padding: 10px 20px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px;">
+                            View Borrowing Details
+                        </a>
+                    </p>
+                    
+                    <p>Thank you for your understanding.</p>
+                    
+                    <p>Best regards,<br/>
+                    Library Team</p>
+                </div>
+                
+                <div style="padding: 10px 20px; background-color: #f8f9fa; color: #6c757d; font-size: 10px;">
+                    This is an automated email. Please do not reply to this email address.
+                </div>
+            </div>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Extension Request Report Action -->
+    <record id="extension_request_report_action" model="ir.actions.report">
+        <field name="name">Extension Request Report</field>
+        <field name="model">library.extension.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">book_borrower_portal.extension_request_report_template</field>
+        <field name="report_file">book_borrower_portal.extension_request_report_template</field>
+        <field name="binding_model_id" ref="book_borrower_portal.model_library_extension_request"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Extension Request - %s' % (object.name)</field>
+    </record>
+    
+    <!-- Extension Request Report Template -->
+    <template id="extension_request_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="request">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        
+                        <!-- Header -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div style="border-bottom: 3px solid #28a745; padding-bottom: 10px; margin-bottom: 20px;">
+                                    <h2 style="color: #28a745; margin: 0;">
+                                        <i class="fa fa-clock"/> Extension Request Report
+                                    </h2>
+                                    <p style="margin: 5px 0 0 0; color: #6c757d;">
+                                        Request Reference: <strong t-field="request.name"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Badge -->
+                        <div class="row mb-3">
+                            <div class="col-12" style="text-align: center;">
+                                <div style="display: inline-block; padding: 10px 30px; border-radius: 25px; font-size: 18px; font-weight: bold;">
+                                    <span t-if="request.status == 'pending'" style="background-color: #fff3cd; color: #856404; border: 2px solid #ffeaa7;">
+                                        ⏳ PENDING REVIEW
+                                    </span>
+                                    <span t-if="request.status == 'approved'" style="background-color: #d4edda; color: #155724; border: 2px solid #c3e6cb;">
+                                        ✅ APPROVED
+                                    </span>
+                                    <span t-if="request.status == 'rejected'" style="background-color: #f8d7da; color: #721c24; border: 2px solid #f5c6cb;">
+                                        ❌ REJECTED
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Member Information -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-user"/> Member Information
+                                    </h4>
+                                    <table class="table table-borderless" style="margin: 0;">
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold; width: 40%;">Name:</td>
+                                            <td style="padding: 2px 0;" t-field="request.member_id.name"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Email:</td>
+                                            <td style="padding: 2px 0;" t-field="request.member_id.email"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Member ID:</td>
+                                            <td style="padding: 2px 0;" t-field="request.member_id.member_id"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Phone:</td>
+                                            <td style="padding: 2px 0;" t-field="request.member_id.phone"/>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="col-6">
+                                <div style="background-color: #e7f3ff; padding: 15px; border-radius: 5px;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-calendar"/> Request Timeline
+                                    </h4>
+                                    <table class="table table-borderless" style="margin: 0;">
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold; width: 50%;">Submitted:</td>
+                                            <td style="padding: 2px 0;" t-field="request.request_date" t-options="{'widget': 'datetime'}"/>
+                                        </tr>
+                                        <tr t-if="request.review_date">
+                                            <td style="padding: 2px 0; font-weight: bold;">Reviewed:</td>
+                                            <td style="padding: 2px 0;" t-field="request.review_date" t-options="{'widget': 'datetime'}"/>
+                                        </tr>
+                                        <tr t-if="request.reviewed_by">
+                                            <td style="padding: 2px 0; font-weight: bold;">Reviewed By:</td>
+                                            <td style="padding: 2px 0;" t-field="request.reviewed_by.name"/>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Book Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div style="background-color: #fff3cd; padding: 20px; border-radius: 5px; border-left: 5px solid #ffc107;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-book-open"/> Book Information
+                                    </h4>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <table class="table table-borderless" style="margin: 0;">
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold; width: 25%;">Title:</td>
+                                                    <td style="padding: 4px 0; font-size: 16px;" t-field="request.book_id.title"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">Author:</td>
+                                                    <td style="padding: 4px 0;" t-field="request.book_id.author"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">ISBN:</td>
+                                                    <td style="padding: 4px 0;" t-field="request.book_id.isbn"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">Borrowing Record:</td>
+                                                    <td style="padding: 4px 0;" t-field="request.borrowing_record_id.name"/>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-4">
+                                            <div style="text-align: center;">
+                                                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                                                    <i class="fa fa-book" style="font-size: 48px; color: #6c757d;"/>
+                                                    <p style="margin-top: 10px; color: #6c757d; font-size: 12px;">Book Cover</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Extension Details -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div style="background-color: #d1ecf1; padding: 20px; border-radius: 5px; border-left: 5px solid #17a2b8;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-calendar-plus"/> Extension Details
+                                    </h4>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <table class="table table-borderless" style="margin: 0;">
+                                                <tr>
+                                                    <td style="padding: 8px 0; font-weight: bold; width: 50%;">Original Due Date:</td>
+                                                    <td style="padding: 8px 0; font-size: 16px;" t-field="request.original_expiry_date"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 0; font-weight: bold;">Requested Due Date:</td>
+                                                    <td style="padding: 8px 0; font-size: 16px; color: #17a2b8;" t-field="request.requested_expiry_date"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 8px 0; font-weight: bold;">Extension Days:</td>
+                                                    <td style="padding: 8px 0; font-size: 18px; color: #28a745;">
+                                                        <strong t-field="request.extension_days"/> days
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-6">
+                                            <t t-if="request.status == 'approved' and request.new_expiry_date">
+                                                <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; text-align: center;">
+                                                    <h5 style="color: #155724; margin-bottom: 10px;">✅ New Due Date</h5>
+                                                    <p style="font-size: 20px; font-weight: bold; color: #155724; margin: 0;" t-field="request.new_expiry_date"/>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Request Reason -->
+                        <t t-if="request.request_reason">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 5px solid #6c757d;">
+                                        <h4 style="color: #495057; margin-bottom: 15px;">
+                                            <i class="fa fa-comment"/> Request Reason
+                                        </h4>
+                                        <p style="margin: 0; font-style: italic; padding: 10px; background-color: white; border-radius: 5px;" t-field="request.request_reason"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        
+                        <!-- Rejection Reason (if rejected) -->
+                        <t t-if="request.status == 'rejected' and request.rejection_reason">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div style="background-color: #f8d7da; padding: 15px; border-radius: 5px; border-left: 5px solid #dc3545;">
+                                        <h4 style="color: #721c24; margin-bottom: 15px;">
+                                            <i class="fa fa-times-circle"/> Rejection Reason
+                                        </h4>
+                                        <p style="margin: 0; padding: 10px; background-color: white; border-radius: 5px;" t-field="request.rejection_reason"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        
+                        <!-- Action Summary -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div style="background-color: #e2e3e5; padding: 15px; border-radius: 5px;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-list-check"/> Action Summary
+                                    </h4>
+                                    <ul style="margin: 0; padding-left: 20px;">
+                                        <li>Extension request submitted on <strong t-field="request.request_date" t-options="{'widget': 'date'}"/></li>
+                                        <li t-if="request.status == 'pending'">Request is currently pending review by library staff</li>
+                                        <li t-if="request.status == 'approved'">
+                                            Request was approved on <strong t-field="request.review_date" t-options="{'widget': 'date'}"/> 
+                                            by <strong t-field="request.reviewed_by.name"/>
+                                        </li>
+                                        <li t-if="request.status == 'rejected'">
+                                            Request was rejected on <strong t-field="request.review_date" t-options="{'widget': 'date'}"/> 
+                                            by <strong t-field="request.reviewed_by.name"/>
+                                        </li>
+                                        <li t-if="request.status == 'approved'">
+                                            Book due date extended by <strong t-field="request.extension_days"/> days
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div style="border-top: 2px solid #dee2e6; padding-top: 15px; margin-top: 20px; text-align: center; color: #6c757d;">
+                                    <p style="margin: 0; font-size: 12px;">
+                                        Generated on <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')"/>
+                                    </p>
+                                    <p style="margin: 0; font-size: 12px;">
+                                        Library Management System - Book Borrower Portal
+                                    </p>
+                                    <p style="margin: 5px 0 0 0; font-size: 10px; color: #adb5bd;">
+                                        This document serves as official confirmation of the extension request and its current status.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

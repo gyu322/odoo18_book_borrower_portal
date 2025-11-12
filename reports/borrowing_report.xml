@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Borrowing Record Report Action -->
+    <record id="borrowing_record_report_action" model="ir.actions.report">
+        <field name="name">Borrowing Record Report</field>
+        <field name="model">library.borrowing.record</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">book_borrower_portal.borrowing_record_report_template</field>
+        <field name="report_file">book_borrower_portal.borrowing_record_report_template</field>
+        <field name="binding_model_id" ref="library_management_1.model_library_borrowing_record"/>
+        <field name="binding_type">report</field>
+        <field name="print_report_name">'Borrowing Record - %s' % (object.book_title)</field>
+    </record>
+    
+    <!-- Borrowing Record Report Template -->
+    <template id="borrowing_record_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="record">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="oe_structure"/>
+                        
+                        <!-- Header -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div style="border-bottom: 3px solid #007bff; padding-bottom: 10px; margin-bottom: 20px;">
+                                    <h2 style="color: #007bff; margin: 0;">
+                                        <i class="fa fa-book"/> Book Borrowing Record
+                                    </h2>
+                                    <p style="margin: 5px 0 0 0; color: #6c757d;">
+                                        Record Reference: <strong t-field="record.name"/>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Member Information -->
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-user"/> Member Information
+                                    </h4>
+                                    <table class="table table-borderless" style="margin: 0;">
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold; width: 40%;">Name:</td>
+                                            <td style="padding: 2px 0;" t-field="record.member_id.name"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Email:</td>
+                                            <td style="padding: 2px 0;" t-field="record.member_id.email"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Phone:</td>
+                                            <td style="padding: 2px 0;" t-field="record.member_id.phone"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Member ID:</td>
+                                            <td style="padding: 2px 0;" t-field="record.member_id.member_id"/>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <div class="col-6">
+                                <div style="background-color: #e7f3ff; padding: 15px; border-radius: 5px;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-info-circle"/> Record Details
+                                    </h4>
+                                    <table class="table table-borderless" style="margin: 0;">
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold; width: 40%;">Record #:</td>
+                                            <td style="padding: 2px 0;" t-field="record.sequence"/>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Status:</td>
+                                            <td style="padding: 2px 0;">
+                                                <span t-if="record.status == 'borrowed'" class="badge badge-primary">Borrowed</span>
+                                                <span t-if="record.status == 'returned'" class="badge badge-success">Returned</span>
+                                                <span t-if="record.status == 'overdue'" class="badge badge-danger">Overdue</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding: 2px 0; font-weight: bold;">Borrow Date:</td>
+                                            <td style="padding: 2px 0;" t-field="record.borrow_date"/>
+                                        </tr>
+                                        <tr t-if="record.return_date">
+                                            <td style="padding: 2px 0; font-weight: bold;">Return Date:</td>
+                                            <td style="padding: 2px 0;" t-field="record.return_date"/>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Book Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div style="background-color: #fff3cd; padding: 20px; border-radius: 5px; border-left: 5px solid #ffc107;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-book-open"/> Book Information
+                                    </h4>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <table class="table table-borderless" style="margin: 0;">
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold; width: 25%;">Title:</td>
+                                                    <td style="padding: 4px 0; font-size: 16px;" t-field="record.book_title"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">Author:</td>
+                                                    <td style="padding: 4px 0;" t-field="record.book_id.author"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">ISBN:</td>
+                                                    <td style="padding: 4px 0;" t-field="record.book_id.isbn"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">Category:</td>
+                                                    <td style="padding: 4px 0;" t-field="record.book_id.category"/>
+                                                </tr>
+                                                <tr>
+                                                    <td style="padding: 4px 0; font-weight: bold;">Publisher:</td>
+                                                    <td style="padding: 4px 0;" t-field="record.book_id.publisher"/>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div class="col-4">
+                                            <div style="text-align: center;">
+                                                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px;">
+                                                    <i class="fa fa-book" style="font-size: 48px; color: #6c757d;"/>
+                                                    <p style="margin-top: 10px; color: #6c757d; font-size: 12px;">Book Cover</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Due Date Information -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; border-left: 5px solid #28a745;">
+                                    <h4 style="color: #495057; margin-bottom: 15px;">
+                                        <i class="fa fa-calendar-alt"/> Due Date Information
+                                    </h4>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p style="margin: 0;"><strong>Expected Return Date:</strong></p>
+                                            <p style="font-size: 18px; margin: 5px 0; color: #28a745;" t-field="record.expected_return_date"/>
+                                        </div>
+                                        <div class="col-6">
+                                            <t t-if="record.status == 'borrowed'">
+                                                <t t-set="days_remaining" t-value="(record.expected_return_date - datetime.date.today()).days"/>
+                                                <p style="margin: 0;"><strong>Days Remaining:</strong></p>
+                                                <p t-if="days_remaining >= 0" style="font-size: 18px; margin: 5px 0; color: #28a745;">
+                                                    <t t-esc="days_remaining"/> days
+                                                </p>
+                                                <p t-if="days_remaining &lt; 0" style="font-size: 18px; margin: 5px 0; color: #dc3545;">
+                                                    Overdue by <t t-esc="-days_remaining"/> days
+                                                </p>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Extension Requests (if any) -->
+                        <t t-if="record.extension_request_ids">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div style="background-color: #e2e3e5; padding: 15px; border-radius: 5px;">
+                                        <h4 style="color: #495057; margin-bottom: 15px;">
+                                            <i class="fa fa-clock"/> Extension Requests
+                                        </h4>
+                                        <table class="table table-sm table-bordered">
+                                            <thead style="background-color: #495057; color: white;">
+                                                <tr>
+                                                    <th>Request Date</th>
+                                                    <th>Requested Date</th>
+                                                    <th>Status</th>
+                                                    <th>Reason</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="record.extension_request_ids" t-as="ext_req">
+                                                    <td t-field="ext_req.request_date" t-options="{'widget': 'date'}"/>
+                                                    <td t-field="ext_req.requested_expiry_date"/>
+                                                    <td>
+                                                        <span t-if="ext_req.status == 'pending'" class="badge badge-warning">Pending</span>
+                                                        <span t-if="ext_req.status == 'approved'" class="badge badge-success">Approved</span>
+                                                        <span t-if="ext_req.status == 'rejected'" class="badge badge-danger">Rejected</span>
+                                                    </td>
+                                                    <td t-field="ext_req.request_reason"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                        
+                        <!-- Footer -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div style="border-top: 2px solid #dee2e6; padding-top: 15px; margin-top: 20px; text-align: center; color: #6c757d;">
+                                    <p style="margin: 0; font-size: 12px;">
+                                        Generated on <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M:%S')"/>
+                                    </p>
+                                    <p style="margin: 0; font-size: 12px;">
+                                        Library Management System - Book Borrower Portal
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="oe_structure"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

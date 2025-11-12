@@ -1,0 +1,764 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <!-- Portal Home Integration - SIMPLIFIED -->
+    <template id="portal_my_home_borrower" inherit_id="portal.portal_my_home">
+        <xpath expr="//div[@id='portal_common_category']" position="inside">
+            <!-- My Profile -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="url">/my/profile</t>
+                <t t-set="title">My Profile</t>
+                <t t-set="text">Manage your member profile</t>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+
+            <!-- Library Members -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="url">/my/members</t>
+                <t t-set="title">Library Members</t>
+                <t t-set="count" t-value="library_member_counts"/>
+                <t t-set="text">View all library members</t>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+
+            <!-- My Borrowed Books -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="url">/my/borrowed-books</t>
+                <t t-set="title">My Borrowed Books</t>
+                <t t-set="text">View your borrowing history</t>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+
+            <!-- Extension Requests -->
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="url">/my/extension-requests</t>
+                <t t-set="title">Extension Requests</t>
+                <t t-set="text">Track your extension requests</t>
+                <t t-set="config_card" t-value="True"/>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Breadcrumb Navigation -->
+    <template id="portal_breadcrumbs" inherit_id="portal.portal_breadcrumbs">
+        <xpath expr="//ol[@class='o_portal_submenu breadcrumb mb-0 flex-grow-1 px-0']" position="inside">
+            <li t-if="page_name == 'member_profile'" class="breadcrumb-item active">My Profile</li>
+            <li t-if="page_name == 'member_list'" class="breadcrumb-item">Library Members</li>
+            <li t-if="page_name == 'borrowed_books'" class="breadcrumb-item active">My Borrowed Books</li>
+            <li t-if="page_name == 'borrowing_detail'" class="breadcrumb-item active">Book Details</li>
+            <li t-if="page_name == 'request_extension'" class="breadcrumb-item active">Request Extension</li>
+            <li t-if="page_name == 'extension_requests'" class="breadcrumb-item active">Extension Requests</li>
+        </xpath>
+    </template>
+
+    <!-- Member Profile View -->
+    <template id="member_profile_view">
+        <t t-call="portal.portal_layout">
+
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-12">
+                        <!-- Success/Error Messages -->
+                        <div class="alert alert-success" t-if="success_msg">
+                            <i class="fa fa-check-circle"/>
+                            <t t-out="success_msg"/>
+                        </div>
+                        <t t-if="errors">
+                            <t t-foreach="errors" t-as="error">
+                                <div class="alert alert-danger">
+                                    <i class="fa fa-exclamation-circle"/>
+                                    <t t-out="error"/>
+                                </div>
+                            </t>
+                        </t>
+
+                        <div class="row">
+                            <!-- Member Information -->
+                            <div class="col-lg-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5><i class="fa fa-user"/> Member Profile</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="post" action="/my/profile" enctype="multipart/form-data">
+                                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="name" class="col-form-label">Name
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="text" name="name" id="name" class="form-control"
+                                                   t-att-value="member.name" required="required"/>
+                                        </div>
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="email" class="col-form-label">Email
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input type="email" name="email" id="email" class="form-control"
+                                                   t-att-value="member.email" required="required"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="phone" class="col-form-label">Phone</label>
+                                            <input type="text" name="phone" id="phone" class="form-control"
+                                                   t-att-value="member.phone"/>
+                                        </div>
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label class="col-form-label">Member Number</label>
+                                            <input type="text" class="form-control"
+                                                   t-att-value="member.sequence" readonly="readonly"/>
+                                        </div>
+                                    </div>
+
+                                            <div class="form-group mb-3">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fa fa-save"/>
+                                                    Update Profile
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statistics -->
+                            <div class="col-lg-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5>
+                                            <i class="fa fa-bar-chart"/>
+                                            Statistics
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <dl class="row">
+                                            <dt class="col-sm-6">Member Status:</dt>
+                                            <dd class="col-sm-6">
+                                                <t t-if="member.member_status == 'active'">
+                                                    <span class="badge badge-success">
+                                                        <t t-out="member.member_status.title()"/>
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge badge-warning">
+                                                        <t t-out="member.member_status.title()"/>
+                                                    </span>
+                                                </t>
+                                            </dd>
+
+                                            <dt class="col-sm-6">Join Date:</dt>
+                                            <dd class="col-sm-6" t-out="member.join_date"/>
+
+                                            <!-- Borrowing stats temporarily disabled - depend on BorrowingRecord model -->
+
+                                            <dt class="col-sm-6">Currently Borrowed:</dt>
+                                            <dd class="col-sm-6">
+                                                <t t-out="member.current_borrowed"/>
+                                                /
+                                                <t t-out="member.max_borrow_limit"/>
+                                            </dd>
+
+                                            <dt class="col-sm-6">Total Borrowed:</dt>
+                                            <dd class="col-sm-6" t-out="member.total_books_borrowed"/>
+
+                                            <dt class="col-sm-6">Overdue Books:</dt>
+                                            <dd class="col-sm-6">
+                                                <t t-if = "member.overdue_books_count > 0">
+                                                    <span class="text-danger">
+                                                        <t t-out="member.overdue_books_count"/>
+                                                    </span>
+                                                </t>
+                                            </dd>
+
+                                            <dt class="col-sm-6">Total Fines:</dt>
+                                            <dd class="col-sm-6">
+
+                                                 <t t-if = "member.total_fines > 0">
+                                                    <span class="text-danger">
+                                                        RM
+                                                        <t t-out="member.total_fines"/>
+                                                    </span>
+                                                </t>
+                                            </dd>
+
+
+                                            <!-- Extension requests temporarily disabled -->
+                                            <!-- <dt class="col-sm-6">Extension Requests:</dt>
+                                            <dd class="col-sm-6" t-out="member.total_extension_requests"/> -->
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- Close col-12 -->
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Member List View -->
+    <template id="member_list_view">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-12">
+
+                        <!-- Search Form -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <form method="get" class="row g-3">
+                                    <div class="col-md-8">
+                                        <input type="text" name="search" class="form-control"
+                                               placeholder="Search members by name or email..."
+                                               t-att-value="search"/>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-search"/>
+                                            Search
+                                        </button>
+                                        <a href="/my/members" class="btn btn-secondary">Clear</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <t t-if="not members">
+                            <div class="alert alert-info">
+                                <p>No library members found.</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Member</th>
+                                                    <th>Member Number</th>
+                                                    <th>Email</th>
+                                                    <th>Phone</th>
+                                                    <th>Status</th>
+                                                    <th>Join Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="members" t-as="member">
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="me-3">
+                                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                                                     style="width: 40px; height: 40px; font-weight: bold;">
+                                                                    <t t-out="member.name[0] if member.name else '?'"/>
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <strong t-out="member.name"/>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-secondary" t-out="member.sequence"/>
+                                                    </td>
+                                                    <td>
+                                                        <a t-attf-href="mailto:{{member.email}}" t-out="member.email"/>
+                                                    </td>
+                                                    <td t-out="member.phone or '-'"/>
+                                                    <td>
+                                                        <t t-if="member.member_status == 'active'">
+                                                            <span class="badge bg-success">
+                                                                <t t-out="member.member_status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-warning">
+                                                                <t t-out="member.member_status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                    </td>
+                                                    <td t-out="member.join_date"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination -->
+                                    <t t-if="pager">
+                                        <t t-call="portal.pager">
+                                            <t t-set="classname">mt-3</t>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Borrowed Books List View -->
+    <template id="borrowed_books_list_view">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-12">
+                        
+                        <!-- Filter and Search Form -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <form method="get" class="row g-3">
+                                    <div class="col-md-3">
+                                        <select name="filterby" class="form-control">
+                                            <option value="all" t-att-selected="'selected' if filterby == 'all' else None">All Books</option>
+                                            <option value="borrowed" t-att-selected="'selected' if filterby == 'borrowed' else None">Currently Borrowed</option>
+                                            <option value="overdue" t-att-selected="'selected' if filterby == 'overdue' else None">Overdue</option>
+                                            <option value="returned" t-att-selected="'selected' if filterby == 'returned' else None">Returned</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select name="sortby" class="form-control">
+                                            <option value="sequence" t-att-selected="'selected' if sortby == 'sequence' else None">Record Number</option>
+                                            <option value="borrow_date" t-att-selected="'selected' if sortby == 'borrow_date' else None">Borrow Date</option>
+                                            <option value="expected_return_date" t-att-selected="'selected' if sortby == 'expected_return_date' else None">Due Date</option>
+                                            <option value="book_title" t-att-selected="'selected' if sortby == 'book_title' else None">Book Title</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="text" name="search" class="form-control"
+                                               placeholder="Search by book title..."
+                                               t-att-value="search"/>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-search"/>
+                                            Filter
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <t t-if="not borrowing_records">
+                            <div class="alert alert-info">
+                                <p>No borrowing records found.</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Record #</th>
+                                                    <th>Book</th>
+                                                    <th>Borrow Date</th>
+                                                    <th>Due Date</th>
+                                                    <th>Status</th>
+                                                    <th>Days Overdue</th>
+                                                    <th>Fine (RM)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="borrowing_records" t-as="record">
+                                                    <td>
+                                                        <span class="badge bg-secondary" t-out="record.sequence"/>
+                                                    </td>
+                                                    <td>
+                                                        <a t-attf-href="/my/borrowed-books/{{record.id}}">
+                                                            <strong t-out="record.book_title"/>
+                                                        </a>
+                                                    </td>
+                                                    <td t-out="record.borrow_date"/>
+                                                    <td t-out="record.expected_return_date"/>
+                                                    <td>
+                                                        <t t-if="record.status == 'borrowed'">
+                                                            <span class="badge bg-primary">
+                                                                <t t-out="record.status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-elif="record.status == 'overdue'">
+                                                            <span class="badge bg-danger">
+                                                                <t t-out="record.status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-success">
+                                                                <t t-out="record.status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="record.days_overdue > 0">
+                                                            <span class="text-danger">
+                                                                <t t-out="record.days_overdue"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted">-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="record.fine_amount > 0">
+                                                            <span class="text-danger">
+                                                                <t t-out="record.fine_amount"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted">-</span>
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination -->
+                                    <t t-if="pager">
+                                        <t t-call="portal.pager">
+                                            <t t-set="classname">mt-3</t>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Borrowing Detail View -->
+    <template id="borrowing_detail_view">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-12">
+                        
+                        <!-- Book Information -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5><i class="fa fa-book"/> Book Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <dl class="row">
+                                            <dt class="col-sm-3">Record Number:</dt>
+                                            <dd class="col-sm-9" t-out="borrowing_record.sequence"/>
+                                            
+                                            <dt class="col-sm-3">Book Title:</dt>
+                                            <dd class="col-sm-9" t-out="borrowing_record.book_title"/>
+                                            
+                                            <dt class="col-sm-3">Borrow Date:</dt>
+                                            <dd class="col-sm-9" t-out="borrowing_record.borrow_date"/>
+                                            
+                                            <dt class="col-sm-3">Due Date:</dt>
+                                            <dd class="col-sm-9" t-out="borrowing_record.expected_return_date"/>
+                                            
+                                            <dt class="col-sm-3">Status:</dt>
+                                            <dd class="col-sm-9">
+                                                <t t-if="borrowing_record.status == 'borrowed'">
+                                                    <span class="badge bg-primary">
+                                                        <t t-out="borrowing_record.status.title()"/>
+                                                    </span>
+                                                </t>
+                                                <t t-elif="borrowing_record.status == 'overdue'">
+                                                    <span class="badge bg-danger">
+                                                        <t t-out="borrowing_record.status.title()"/>
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="badge bg-success">
+                                                        <t t-out="borrowing_record.status.title()"/>
+                                                    </span>
+                                                </t>
+                                            </dd>
+                                        </dl>
+                                        
+                                        <!-- Extension Request Button -->
+                                        <t t-if="can_request_extension">
+                                            <a t-attf-href="/my/borrowed-books/{{borrowing_record.id}}/request-extension" 
+                                               class="btn btn-primary">
+                                                <i class="fa fa-clock-o"/> Request Extension
+                                            </a>
+                                        </t>
+                                        <t t-elif="pending_extension_request">
+                                            <div class="alert alert-info">
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fa fa-clock-o me-2 text-info"/>
+                                                    <div class="flex-grow-1">
+                                                        <strong>Extension Request Pending</strong><br/>
+                                                        <small>Request <t t-out="pending_extension_request.name"/> submitted on <t t-out="pending_extension_request.request_date" t-options="{'widget': 'date'}"/></small>
+                                                    </div>
+                                                    <a t-attf-href="/my/extension-requests/{{pending_extension_request.id}}" 
+                                                       class="btn btn-sm btn-outline-info">
+                                                        <i class="fa fa-eye"/> View Request
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="alert alert-warning">
+                                                <t t-if="borrowing_record.status != 'borrowed'">
+                                                    Extension not available - book is not currently borrowed.
+                                                </t>
+                                                <t t-elif="borrowing_record.expected_return_date and borrowing_record.expected_return_date &lt; datetime.date.today()">
+                                                    Extension not available - book is overdue.
+                                                </t>
+                                                <t t-else="">
+                                                    Extension cannot be requested for this book at this time.
+                                                </t>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Extension History -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fa fa-history"/> Extension History</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="alert alert-info">
+                                    <p>To view extension request history, go to <strong><a href="/my/extension-requests">My Extension Requests</a></strong></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation -->
+                        <div class="mt-3">
+                            <a href="/my/borrowed-books" class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"/> Back to Borrowed Books
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Extension Not Allowed -->
+    <template id="extension_not_allowed">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="alert alert-warning text-center">
+                            <h4><i class="fa fa-exclamation-triangle"/> Extension Not Available</h4>
+                            
+                            <t t-if="reason">
+                                <p class="fw-bold" t-out="reason"/>
+                            </t>
+                            <t t-else="">
+                                <p>Extension cannot be requested for this book at this time.</p>
+                            </t>
+                            
+                            <!-- Show existing pending request details if available -->
+                            <t t-if="existing_request">
+                                <div class="mt-3 p-3 bg-light rounded">
+                                    <h6><i class="fa fa-info-circle"/> Existing Request Details</h6>
+                                    <dl class="row text-start">
+                                        <dt class="col-sm-4">Request Number:</dt>
+                                        <dd class="col-sm-8" t-out="existing_request.name"/>
+                                        
+                                        <dt class="col-sm-4">Submitted:</dt>
+                                        <dd class="col-sm-8" t-out="existing_request.request_date" t-options="{'widget': 'datetime'}"/>
+                                        
+                                        <dt class="col-sm-4">Status:</dt>
+                                        <dd class="col-sm-8">
+                                            <span class="badge badge-warning">Pending Review</span>
+                                        </dd>
+                                        
+                                        <dt class="col-sm-4">Requested Date:</dt>
+                                        <dd class="col-sm-8" t-out="existing_request.requested_expiry_date"/>
+                                    </dl>
+                                    <a t-attf-href="/my/extension-requests/{{existing_request.id}}" class="btn btn-sm btn-info">
+                                        <i class="fa fa-eye"/> View Request Details
+                                    </a>
+                                </div>
+                            </t>
+                            
+                            <div class="mt-3">
+                                <a t-attf-href="/my/borrowed-books/{{borrowing_record.id}}" class="btn btn-primary me-2">
+                                    <i class="fa fa-arrow-left"/> Back to Book Details
+                                </a>
+                                <a href="/my/extension-requests" class="btn btn-outline-secondary">
+                                    <i class="fa fa-list"/> View All Extension Requests
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Extension Requests List View -->
+    <template id="extension_requests_list_view">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-12">
+                        <h3><i class="fa fa-clock-o"/> My Extension Requests</h3>
+                        
+                        <!-- Filter Form -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <form method="get" class="row g-3">
+                                    <div class="col-md-3">
+                                        <select name="filterby" class="form-control">
+                                            <option value="all" t-att-selected="'selected' if filterby == 'all' else None">All Requests</option>
+                                            <option value="pending" t-att-selected="'selected' if filterby == 'pending' else None">Pending</option>
+                                            <option value="approved" t-att-selected="'selected' if filterby == 'approved' else None">Approved</option>
+                                            <option value="rejected" t-att-selected="'selected' if filterby == 'rejected' else None">Rejected</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select name="sortby" class="form-control">
+                                            <option value="request_date" t-att-selected="'selected' if sortby == 'request_date' else None">Request Date</option>
+                                            <option value="status" t-att-selected="'selected' if sortby == 'status' else None">Status</option>
+                                            <option value="book_title" t-att-selected="'selected' if sortby == 'book_title' else None">Book Title</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fa fa-filter"/> Apply Filter
+                                        </button>
+                                        <a href="/my/extension-requests" class="btn btn-secondary">Clear</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <t t-if="not extension_requests">
+                            <div class="alert alert-info">
+                                <p>No extension requests found.</p>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Request #</th>
+                                                    <th>Book</th>
+                                                    <th>Request Date</th>
+                                                    <th>Requested Due Date</th>
+                                                    <th>Status</th>
+                                                    <th>Reviewed By</th>
+                                                    <th>Review Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="extension_requests" t-as="ext_request">
+                                                    <td>
+                                                        <span class="badge bg-secondary" t-out="ext_request.name"/>
+                                                    </td>
+                                                    <td>
+                                                        <strong t-out="ext_request.book_id.title"/>
+                                                    </td>
+                                                    <td t-out="ext_request.request_date"/>
+                                                    <td t-out="ext_request.requested_expiry_date"/>
+                                                    <td>
+                                                        <t t-if="ext_request.status == 'pending'">
+                                                            <span class="badge bg-warning">
+                                                                <t t-out="ext_request.status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-elif="ext_request.status == 'approved'">
+                                                            <span class="badge bg-success">
+                                                                <t t-out="ext_request.status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="badge bg-danger">
+                                                                <t t-out="ext_request.status.title()"/>
+                                                            </span>
+                                                        </t>
+                                                    </td>
+                                                    <td>
+                                                        <t t-if="ext_request.reviewed_by">
+                                                            <span t-out="ext_request.reviewed_by.name"/>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span class="text-muted">-</span>
+                                                        </t>
+                                                    </td>
+                                                    <td t-out="ext_request.review_date or '-'"/>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- Pagination -->
+                                    <t t-if="pager">
+                                        <t t-call="portal.pager">
+                                            <t t-set="classname">mt-3</t>
+                                        </t>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- No Member Access -->
+    <template id="no_member_access">
+        <t t-call="portal.portal_layout">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <t t-if="error_message">
+                            <div class="alert alert-danger text-center">
+                                <h4>
+                                    <i class="fa fa-exclamation-circle"/>
+                                    Registration Error
+                                </h4>
+                                <p t-out="error_message"/>
+                                <div class="mt-3">
+                                    <a href="/my/home" class="btn btn-secondary">Go Back</a>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-warning text-center">
+                                <h4>
+                                    <i class="fa fa-exclamation-triangle"/>
+                                    Access Denied
+                                </h4>
+                                <p>You don't have access to the library portal. You need to be registered as a library
+                                    member.
+                                </p>
+                                <div class="mt-3">
+                                    <a href="/my/create-member" class="btn btn-primary">
+                                        <i class="fa fa-user-plus"/>
+                                        Register as Member
+                                    </a>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">This will automatically create your member account using
+                                        your user details.
+                                    </small>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

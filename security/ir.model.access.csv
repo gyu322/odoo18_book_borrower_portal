@@ -1,0 +1,14 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_library_member_portal_user,library.member.portal,library_management_1.model_library_member,base.group_portal,1,1,0,0
+access_library_book_portal_user,library.book.portal,library_management_1.model_library_book,base.group_portal,1,0,0,0
+access_library_librarian_portal_user,library.librarian.portal,library_management_1.model_library_librarian,base.group_portal,1,0,0,0
+access_library_librarian_user,library.librarian.user,library_management_1.model_library_librarian,base.group_user,1,1,1,1
+access_library_librarian_system,library.librarian.system,library_management_1.model_library_librarian,base.group_system,1,1,1,1
+access_library_borrowing_record_portal_user,library.borrowing.record.portal,library_management_1.model_library_borrowing_record,base.group_portal,1,0,0,0
+access_library_extension_request_portal_user,library.extension.request.portal,book_borrower_portal.model_library_extension_request,base.group_portal,1,1,1,0
+access_library_extension_request_user,library.extension.request.user,book_borrower_portal.model_library_extension_request,base.group_user,1,1,1,1
+access_library_extension_request_system,library.extension.request.system,book_borrower_portal.model_library_extension_request,base.group_system,1,1,1,1
+access_library_extension_request_reject_wizard_user,library.extension.request.reject.wizard.user,book_borrower_portal.model_library_extension_request_reject_wizard,base.group_user,1,1,1,1
+access_library_extension_request_reject_wizard_system,library.extension.request.reject.wizard.system,book_borrower_portal.model_library_extension_request_reject_wizard,base.group_system,1,1,1,1
+access_ir_sequence_portal_user,ir.sequence.portal,base.model_ir_sequence,base.group_portal,1,0,0,0
+access_mail_template_portal_user,mail.template.portal,mail.model_mail_template,base.group_portal,1,0,0,0

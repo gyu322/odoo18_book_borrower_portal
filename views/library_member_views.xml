@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    
+    <!-- Library Member Form View Extension -->
+    <record id="library_member_form_view_portal_extension" model="ir.ui.view">
+        <field name="name">library.member.form.portal.extension</field>
+        <field name="model">library.member</field>
+        <field name="inherit_id" ref="library_management_1.library_member_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phone']" position="after">
+                <!-- Portal Access Section -->
+                <separator string="Portal Access" colspan="4"/>
+                <group col="4">
+                    <field name="is_portal_user"/>
+                    <field name="user_id" invisible="is_portal_user == False"/>
+                    <field name="last_portal_login" invisible="is_portal_user == False"/>
+                </group>
+            </xpath>
+            
+            <xpath expr="//field[@name='returned_books_count']" position="after">
+                <!-- Extension Request Statistics -->
+                <separator string="Extension Request Statistics" colspan="4"/>
+                <group col="4">
+                    <field name="total_extension_requests"/>
+                    <field name="pending_extension_requests"/>
+                    <field name="approved_extension_requests"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Library Member Tree View Extension -->
+    <record id="library_member_tree_view_portal_extension" model="ir.ui.view">
+        <field name="name">library.member.tree.portal.extension</field>
+        <field name="model">library.member</field>
+        <field name="inherit_id" ref="library_management_1.library_member_list_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='member_status']" position="after">
+                <field name="is_portal_user" widget="boolean_toggle"/>
+                <field name="pending_extension_requests"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Action buttons -->
+    <record id="library_member_form_view_portal_buttons" model="ir.ui.view">
+        <field name="name">library.member.form.portal.buttons</field>
+        <field name="model">library.member</field>
+        <field name="inherit_id" ref="library_member_form_view_portal_extension"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="action_create_portal_user" type="object" string="Create Portal User" 
+                            class="btn-primary" invisible="is_portal_user == True"/>
+                    <button name="action_reset_portal_password" type="object" string="Reset Portal Password" 
+                            class="btn-secondary" invisible="is_portal_user == False"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Extension Request List View -->
+    <record id="extension_request_tree_view" model="ir.ui.view">
+        <field name="name">library.extension.request.tree</field>
+        <field name="model">library.extension.request</field>
+        <field name="arch" type="xml">
+            <list string="Extension Requests" decoration-warning="status=='pending'" 
+                  decoration-success="status=='approved'" decoration-danger="status=='rejected'">
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="book_id"/>
+                <field name="request_date"/>
+                <field name="requested_expiry_date"/>
+                <field name="extension_days"/>
+                <field name="status" widget="badge"/>
+                <field name="reviewed_by"/>
+                <field name="review_date"/>
+            </list>
+        </field>
+    </record>
+    
+    <!-- Extension Request Form View -->
+    <record id="extension_request_form_view" model="ir.ui.view">
+        <field name="name">library.extension.request.form</field>
+        <field name="model">library.extension.request</field>
+        <field name="arch" type="xml">
+            <form string="Extension Request">
+                <header>
+                    <button name="action_approve" type="object" string="Approve" 
+                            class="btn-primary" invisible="status != 'pending'"/>
+                    <button name="action_reject" type="object" string="Reject" 
+                            class="btn-danger" invisible="status != 'pending'"/>
+                    <field name="status" widget="statusbar" statusbar_visible="pending,approved,rejected"/>
+                </header>
+                
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group>
+                            <field name="borrowing_record_id"/>
+                            <field name="member_id"/>
+                            <field name="book_id"/>
+                            <field name="request_date"/>
+                        </group>
+                        <group>
+                            <field name="original_expiry_date"/>
+                            <field name="requested_expiry_date"/>
+                            <field name="extension_days"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Request Details">
+                        <field name="request_reason" nolabel="1" placeholder="Member's reason for extension..."/>
+                    </group>
+                    
+                    <group string="Review Information" invisible="status == 'pending'">
+                        <group>
+                            <field name="reviewed_by"/>
+                            <field name="review_date"/>
+                        </group>
+                        <group>
+                            <field name="new_expiry_date" invisible="status != 'approved'"/>
+                        </group>
+                    </group>
+                    
+                    <group string="Rejection Details" invisible="status != 'rejected'">
+                        <field name="rejection_reason" nolabel="1" placeholder="Reason for rejection..."/>
+                    </group>
+                </sheet>
+                
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Extension Request Search View -->
+    <record id="extension_request_search_view" model="ir.ui.view">
+        <field name="name">library.extension.request.search</field>
+        <field name="model">library.extension.request</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="member_id"/>
+                <field name="book_id"/>
+                <filter string="Pending" name="pending" domain="[('status', '=', 'pending')]"/>
+                <filter string="Approved" name="approved" domain="[('status', '=', 'approved')]"/>
+                <filter string="Rejected" name="rejected" domain="[('status', '=', 'rejected')]"/>
+                <separator/>
+                <filter string="This Week" name="this_week" domain="[('request_date', '>=', (context_today() - datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter string="This Month" name="this_month" domain="[('request_date', '>=', (context_today().replace(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                    <filter string="Member" name="group_member" context="{'group_by': 'member_id'}"/>
+                    <filter string="Request Date" name="group_request_date" context="{'group_by': 'request_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Extension Request Action -->
+    <record id="extension_request_action" model="ir.actions.act_window">
+        <field name="name">Extension Requests</field>
+        <field name="res_model">library.extension.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_pending': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                No extension requests found!
+            </p>
+            <p>
+                Extension requests from portal users will appear here for review.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu Item -->
+    <menuitem id="extension_request_menu" name="Extension Requests" 
+              parent="library_management_1.library_member_root_menu" 
+              action="extension_request_action" 
+              sequence="50"/>
+
+</odoo>

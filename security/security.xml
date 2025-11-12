@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Record Rules for Portal Users -->
+    
+    <!-- Portal users can only see their own borrowing records -->
+    <record id="borrowing_record_portal_rule" model="ir.rule">
+        <field name="name">Portal User: Own Borrowing Records</field>
+        <field name="model_id" ref="library_management_1.model_library_borrowing_record"/>
+        <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Portal users can only see their own extension requests -->
+    <record id="extension_request_portal_rule" model="ir.rule">
+        <field name="name">Portal User: Own Extension Requests</field>
+        <field name="model_id" ref="book_borrower_portal.model_library_extension_request"/>
+        <field name="domain_force">[('member_id.user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Portal users can only see their own member record -->
+    <record id="library_member_portal_rule" model="ir.rule">
+        <field name="name">Portal User: Own Member Record</field>
+        <field name="model_id" ref="library_management_1.model_library_member"/>
+        <field name="domain_force">[('user_id', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    
+    <!-- Internal users can see all records -->
+    <record id="borrowing_record_internal_rule" model="ir.rule">
+        <field name="name">Internal User: All Borrowing Records</field>
+        <field name="model_id" ref="library_management_1.model_library_borrowing_record"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    
+    <record id="extension_request_internal_rule" model="ir.rule">
+        <field name="name">Internal User: All Extension Requests</field>
+        <field name="model_id" ref="book_borrower_portal.model_library_extension_request"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    
+    <record id="library_member_internal_rule" model="ir.rule">
+        <field name="name">Internal User: All Member Records</field>
+        <field name="model_id" ref="library_management_1.model_library_member"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+</odoo>

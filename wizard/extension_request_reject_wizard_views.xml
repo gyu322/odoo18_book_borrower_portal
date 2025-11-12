@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <!-- Extension Request Rejection Wizard -->
+    <record id="extension_request_reject_wizard_form" model="ir.ui.view">
+        <field name="name">Extension Request Rejection Wizard</field>
+        <field name="model">library.extension.request.reject.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Reject Extension Request">
+                <group>
+                    <field name="request_id" readonly="1"/>
+                    <field name="rejection_reason" widget="text" placeholder="Please provide a clear reason for rejecting this extension request..."/>
+                </group>
+                <footer>
+                    <button name="action_reject_request" string="Reject Request" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
