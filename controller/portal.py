@@ -100,6 +100,14 @@ class BookBorrowerPortal(CustomerPortal):
             email = kwargs.get('email', '').strip()
             phone = kwargs.get('phone', '').strip()
             
+            # Address fields
+            street = kwargs.get('street', '').strip()
+            street2 = kwargs.get('street2', '').strip()
+            city = kwargs.get('city', '').strip()
+            state = kwargs.get('state', '').strip()
+            zip_code = kwargs.get('zip_code', '').strip()
+            country = kwargs.get('country', '').strip()
+            
             if not name:
                 errors.append("Name is required.")
             if not email:
@@ -111,6 +119,12 @@ class BookBorrowerPortal(CustomerPortal):
                         'name': name,
                         'email': email,
                         'phone': phone,
+                        'street': street,
+                        'street2': street2,
+                        'city': city,
+                        'state': state,
+                        'zip_code': zip_code,
+                        'country': country,
                     })
                     # Also update user email if different
                     if member.user_id and member.user_id.email != email:

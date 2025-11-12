@@ -69,6 +69,12 @@ class LibraryMember(models.Model):
             'name': self.name,
             'email': self.email,
             'phone': self.phone,
+            'street': self.street,
+            'street2': self.street2,
+            'city': self.city,
+            'state_id': self._get_state_id(self.state) if self.state else False,
+            'zip': self.zip_code,
+            'country_id': self._get_country_id(self.country) if self.country else False,
             'is_company': False,
             'customer_rank': 1,
         }
@@ -91,6 +97,24 @@ class LibraryMember(models.Model):
         })
         
         return user
+    
+    def _get_state_id(self, state_name):
+        """Get state ID by name"""
+        if not state_name:
+            return False
+        state = self.env['res.country.state'].search([
+            ('name', 'ilike', state_name)
+        ], limit=1)
+        return state.id if state else False
+    
+    def _get_country_id(self, country_name):
+        """Get country ID by name"""
+        if not country_name:
+            return False
+        country = self.env['res.country'].search([
+            ('name', 'ilike', country_name)
+        ], limit=1)
+        return country.id if country else False
     
     def action_create_portal_user(self):
         """Action to create portal user"""

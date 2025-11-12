@@ -112,6 +112,47 @@
                                                    t-att-value="member.sequence" readonly="readonly"/>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Address Fields -->
+                                    <h6 class="mb-3 mt-4">Address Information</h6>
+                                    <div class="row">
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="street" class="col-form-label">Street Address</label>
+                                            <input type="text" name="street" id="street" class="form-control"
+                                                   t-att-value="member.street" placeholder="Street address"/>
+                                        </div>
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="street2" class="col-form-label">Street 2</label>
+                                            <input type="text" name="street2" id="street2" class="form-control"
+                                                   t-att-value="member.street2" placeholder="Apartment, suite, unit, etc."/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="form-group col-md-4 mb-3">
+                                            <label for="city" class="col-form-label">City</label>
+                                            <input type="text" name="city" id="city" class="form-control"
+                                                   t-att-value="member.city" placeholder="City"/>
+                                        </div>
+                                        <div class="form-group col-md-4 mb-3">
+                                            <label for="state" class="col-form-label">State/Province</label>
+                                            <input type="text" name="state" id="state" class="form-control"
+                                                   t-att-value="member.state" placeholder="State or Province"/>
+                                        </div>
+                                        <div class="form-group col-md-4 mb-3">
+                                            <label for="zip_code" class="col-form-label">Zip/Postal Code</label>
+                                            <input type="text" name="zip_code" id="zip_code" class="form-control"
+                                                   t-att-value="member.zip_code" placeholder="12345"/>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="form-group col-md-6 mb-3">
+                                            <label for="country" class="col-form-label">Country</label>
+                                            <input type="text" name="country" id="country" class="form-control"
+                                                   t-att-value="member.country" placeholder="Country"/>
+                                        </div>
+                                    </div>
 
                                             <div class="form-group mb-3">
                                                 <button type="submit" class="btn btn-primary">
@@ -242,6 +283,7 @@
                                                     <th>Member Number</th>
                                                     <th>Email</th>
                                                     <th>Phone</th>
+                                                    <th>City</th>
                                                     <th>Status</th>
                                                     <th>Join Date</th>
                                                 </tr>
@@ -268,6 +310,7 @@
                                                         <a t-attf-href="mailto:{{member.email}}" t-out="member.email"/>
                                                     </td>
                                                     <td t-out="member.phone or '-'"/>
+                                                    <td t-out="member.city or '-'"/>
                                                     <td>
                                                         <t t-if="member.member_status == 'active'">
                                                             <span class="badge bg-success">
